@@ -36,9 +36,7 @@
           "pipelines/step-types",
           "pipelines/operators",
           "pipelines/triggers",
-          "pipelines/runs",
-          "pipelines/execution-modes",
-          "pipelines/monitoring"
+          "pipelines/runs"
         ]
       },
       {

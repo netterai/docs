@@ -24,10 +24,6 @@ Authorization: Bearer ntr_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 Every key starts with the `ntr_` prefix and is tied to the user and company it was created in. See [API keys](/api/api-keys) to create and manage them.
 
-## Rate limits
-
-The upload endpoint is limited to **10 requests per minute** per API key. Exceeding the limit returns `429 Too Many Requests`.
-
 ## Connecting from an IP-allowlisted network
 
 If your network or partner only allows outbound calls to a fixed set of IPs, send requests to the dedicated ingest host instead of `api.netter.ai`. It routes to the same API through two **static IP addresses** that never change:

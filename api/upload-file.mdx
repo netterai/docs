@@ -89,7 +89,7 @@ Returns `201 Created`. The `state` field tells you what happened next.
   `true` if this upload replaced an existing file with the same name.
 </ResponseField>
 <ResponseField name="state" type="string">
-  `committed` or `pending`—see below.
+  `committed` (parsed automatically) or `pending` (needs confirmation in the **Files** view in the app).
 </ResponseField>
 <ResponseField name="databases" type="array">
   Present when `state` is `committed`. Each entry has `id`, `name`, and `refresh_status` for the database being created from the file.
@@ -97,26 +97,6 @@ Returns `201 Created`. The `state` field tells you what happened next.
 <ResponseField name="sheets" type="array">
   Present when `state` is `pending`. The detected sheets and headers awaiting confirmation.
 </ResponseField>
-
-### Committed vs. pending
-
-- **`committed`** — clean CSV and JSON files parse automatically. Netter creates the database(s) and starts ingesting immediately. The `databases` array holds the new database stubs.
-- **`pending`** — Excel files, and CSVs with detected preamble rows, need a quick confirmation step (which sheets, which header row). The `sheets` array describes what was detected; finish the import from the **Files** view in the app.
-
-```json Committed
-{
-  "id": "9f1c2d3e-...",
-  "name": "data.csv",
-  "file_type": "csv",
-  "size_bytes": 20480,
-  "replaced": false,
-  "state": "committed",
-  "sheets": [],
-  "databases": [
-    { "id": "5a6b7c8d-...", "name": "data.csv", "refresh_status": "refreshing" }
-  ]
-}
-```
 
 ## Errors
 
