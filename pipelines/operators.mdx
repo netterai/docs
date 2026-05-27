@@ -1,0 +1,30 @@
+---
+title: Operators
+description: Operators are the pre-coded building blocks the Architect configures inside each step. Same step type, many operator choices.
+---
+
+Each step has a **type** (its role in the DAG) and an **operator** (the pre-coded logic that runs inside it). The Architect picks operators when it composes the pipeline; you can swap an operator from the step inspector.
+
+## Categories
+
+| Category | Operators | What it does |
+|----------|-----------|--------------|
+| **Ingest** | `api_source`, `file_source` | Fetch data from external APIs or uploaded files |
+| **Read** | `database_query` | Run SQL against project and shared company databases |
+| **Transform** | `join`, `fuzzy_join`, `cascade_join`, `filter`, `aggregate`, `compute_column`, `sort`, `deduplicate`, `pivot`, `unpivot`, `union`, `rename_columns`, `select_columns`, `window` | Reshape, combine, and clean data |
+| **AI** | `ai_classify`, `ai_extract`, `ai_summarize`, `ai_score` | Per-row LLM inference |
+| **Action** | `api_action` | Write back to an external system (send email, create ticket, etc.) |
+| **Storage** | `table_sink` | Write rows into a project database |
+| **Virtual** | `database`, `dashboard` | Materialize a table; render a visualization |
+| **Escape** | `custom_code` | LLM-generated Python for cases the catalog doesn't cover |
+
+## Choosing an operator
+
+The Architect generally picks the right operator from your description. When you're swapping by hand, two questions matter:
+
+- **Where does this step sit?** Root-only operators (`api_source`, `file_source`, `database_query`) can only start a branch. Storage (`table_sink`) can only end one.
+- **Is the operator fusable?** Most transforms compile into a single DuckDB query when chained. Operators like `fuzzy_join`, `cascade_join`, and `custom_code` run in isolation. This is a performance detail, not a correctness one.
+
+## Custom code
+
+When no operator fits, `custom_code` lets the Architect generate Python that runs in an isolated sandbox. Prefer a catalog operator when one exists—it's faster, deterministic, and easier to reason about.

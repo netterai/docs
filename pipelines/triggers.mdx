@@ -1,0 +1,29 @@
+---
+title: Triggers
+description: Triggers decide when a pipeline runs without anyone clicking. Attach them to database steps.
+---
+
+A **trigger** fires a run automatically. Triggers live on `database` steps—not on roots, not on transforms. When a database is triggered, the platform refreshes its **ancestor closure**: every step that contributes to that database.
+
+## Trigger types
+
+| Type | When it fires |
+|------|---------------|
+| **Schedule** | On a cron expression (e.g. every hour, every weekday at 6am UTC). |
+| **Manual** | When someone clicks **Refresh** on the database, or **Run all** on the project. |
+
+Triggers are configured from the database step's inspector. A single database can carry one schedule trigger plus the implicit manual one.
+
+## Cascade
+
+Triggers aren't the only way runs start. When an upstream database is refreshed, every downstream pipeline that reads from it cascades automatically. This is configuration-free—wire the `data_read` step to the upstream database and the dependency is tracked from then on.
+
+Cascades are debounced and idempotent: rapid upstream refreshes coalesce into a single downstream run, and unchanged refreshes are skipped (see [Runs](/pipelines/runs) for cascade events).
+
+## Schedule mechanics
+
+Schedules run in the platform's worker, not in your browser. Each fire creates a Run scoped to the triggered database's ancestor closure. Schedules continue to fire even if a previous run is still in progress; if you don't want overlap, set the interval longer than the run takes.
+
+## Disabling a trigger
+
+You can pause a trigger from the database step inspector. A paused trigger stays configured but does not fire until you resume it. Cascade is paused by suppressing the downstream `data_read` or the database itself.

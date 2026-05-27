@@ -1,0 +1,64 @@
+---
+title: Row-level security
+description: RLS narrows what's inside a permissioned database. A member who can read the Customers table can still be restricted to a subset of rows.
+---
+
+**Row-level security** (RLS) is a per-user filter applied on top of a database the member already has access to. It answers the question "of the rows in this table, which ones is this person allowed to see?"
+
+## When to use it
+
+Resource [permissions](/permissions/overview) decide whether a member can read a database at all. RLS decides which **rows** inside that database they see. Typical reasons:
+
+- A salesperson should see only their own accounts in `customers`.
+- A regional manager should see only invoices for their region.
+- A vendor partner should see only tickets they're assigned to.
+
+If a member shouldn't see the table at all, revoke the resource grant—don't try to enforce that through RLS.
+
+## How a policy works
+
+A **row policy** binds a user to a list of filters on a database (or entity). Each filter is a triple:
+
+```
+(column, operator, allowed_values)
+```
+
+Available operators:
+
+| Operator | Meaning |
+|----------|---------|
+| `in` | Column value is in the allowed set. |
+| `not_in` | Column value is not in the allowed set. |
+| `eq` / `neq` | Equal / not equal. |
+| `gt`, `gte`, `lt`, `lte` | Numeric or date comparisons. |
+
+A policy with multiple filters **ANDs** them together—every filter must pass for the row to be visible. To allow several disjoint subsets, give the column multiple allowed values with `in`.
+
+## Where filters are applied
+
+RLS is enforced server-side, before the data ever reaches the user:
+
+- **Pipeline and dashboard reads** — filters are applied as a `WHERE` wrapper around the user's SQL, or as an in-memory filter before the table is registered with DuckDB.
+- **App queries** — the [app's SQL endpoint](/applications/bindings) reuses the same RLS resolution.
+- **Natural-language queries** — the [ontology query](/ontology/query) path applies RLS to the generated SQL.
+- **Action writes** — when a viewer writes a row through an [app action](/applications/actions), the platform checks the new row against the user's RLS filters and rejects writes that would land in a row they couldn't read.
+
+## Owner bypass
+
+Owners are not subject to RLS. Admins and viewers are. This matches the company-role bypass that exists for resource permissions.
+
+## Fail-closed on writes
+
+For reads, a row with a missing RLS column is skipped (the platform can't evaluate the filter, so it conservatively excludes the row).
+
+For **writes**, a payload that's missing an RLS-constrained column is **rejected**—otherwise a viewer could dodge their policy by omitting the column.
+
+## Configure a policy
+
+From the database (or entity) detail page, open **Row-level security** and:
+
+1. Pick the member or role the policy applies to.
+2. Add one filter at a time—column, operator, allowed values.
+3. Save. The policy takes effect on the next query.
+
+Test by impersonating the member or using a viewer account—the filtered table should show only the matching rows.

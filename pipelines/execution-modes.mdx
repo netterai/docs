@@ -1,0 +1,34 @@
+---
+title: Incremental vs full runs
+description: Steps default to incremental execution, processing only new or changed rows. Full runs reprocess everything.
+---
+
+Each step has an **execution mode** that controls how much work it does on every run.
+
+## The two modes
+
+| Mode | Behavior |
+|------|----------|
+| **Incremental** (default) | The step processes only rows whose `_updated_at` is newer than the last successful run. New rows are upserted into the output by `_row_key`. |
+| **Full** | The step reprocesses every input row from scratch. The output is rewritten end to end. |
+
+Incremental keeps refreshes cheap—especially for AI steps and external API writes, which charge per row.
+
+## Picking a mode
+
+Most operators support either mode (`incremental_support: auto`). A few operators are **full-only** because incremental wouldn't be semantically sound—for example, certain join shapes. The step inspector disables the **Incremental** option in those cases.
+
+Per-step rules apply on top of that: non-inner joins (`left`, `right`, `full`, `outer`) automatically downgrade to a full run, because the delta-join algebra is only safe for inner joins.
+
+## Force a full run
+
+When you need to reprocess everything—a bug fix, a schema change, a manual reload—use **Run all (full)** or pass `force_full` on the run. Schedule and cascade runs always stay incremental; full runs are an explicit, manual action.
+
+## Watermarks
+
+Behind the scenes, each successful step run records:
+
+- the highest `_updated_at` it saw on input (so the next incremental run knows where to resume),
+- the highest `_updated_at` it produced on output (used by downstream cascades to decide whether anything actually changed).
+
+You don't manage watermarks directly—they're computed and persisted on each successful run. Editing a step's configuration invalidates the watermark for that step, so the next run replays from the beginning.

@@ -1,0 +1,74 @@
+---
+title: Step types
+description: Every step in a pipeline has exactly one type that determines its role, where it can sit in the DAG, and how it runs.
+---
+
+A pipeline is a DAG of **steps**. Each step has exactly one **type** that decides whether it can be a root, what children it can have, and whether it carries executable code.
+
+## Overview
+
+| Type | Role | Position | Trigger | Provider |
+|------|------|----------|---------|----------|
+| `source` | Fetch external data via an API | Root only | — | Required |
+| `data_read` | Read from a project database (DuckDB) | Root only | — | None |
+| `process` | Process, enrich, or act on data | Has parents | — | Optional |
+| `data_sink` | Write data into a database | After executable steps | — | None |
+| `database` | Project-level data table (virtual) | After `data_sink` | schedule, manual | None |
+| `dashboard` | Auto-generated visualization (virtual) | After `database`, terminal | — | None |
+
+## Detailed rules
+
+### `source`
+
+Pulls data from an external system through a connected integration.
+
+- Must be a **root**—no parents.
+- Requires a **provider** (the integration to call).
+- Children can be any type except `source` or `data_read`.
+
+### `data_read`
+
+Reads from one of your project's own databases.
+
+- Must be a **root**.
+- No provider needed—it uses the internal DuckDB engine.
+- Useful for branching off a previously-stored table.
+
+### `process`
+
+The workhorse: transforms, joins, filters, enriches, or acts on data.
+
+- Must have at least one parent.
+- Can chain other `process` steps, or pipe into a `data_sink`.
+- Provider is optional—required only when the operator calls an external API.
+
+### `data_sink`
+
+Persists rows into a project database.
+
+- Must have at least one parent.
+- Its only child is a `database` node.
+- Each row must include the platform's row-identity columns; the operator config handles this.
+
+### `database` (virtual)
+
+Represents a project-level data table. Created at deploy time from the `data_sink` above it.
+
+- Carries the pipeline's [triggers](/pipelines/triggers): `schedule` (cron) or manual.
+- Firing a trigger refreshes everything in this database's ancestor closure.
+
+### `dashboard` (virtual)
+
+Auto-generated visualization built from a database.
+
+- Must be terminal—no children.
+- Code is generated at deploy time; you describe what to visualize.
+
+## DAG rules
+
+1. At least one root step per project.
+2. Only `database` steps carry triggers.
+3. No cycles—the graph must be a valid DAG.
+4. Step slugs are unique within a project.
+5. `source` and `data_read` stay as roots; they cannot appear as children of other steps.
+6. `dashboard` steps are always terminal.

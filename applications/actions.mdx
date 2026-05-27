@@ -1,0 +1,30 @@
+---
+title: Actions
+description: Actions are the typed write operations an app exposes. They're how viewers safely change ontology data.
+---
+
+An **action** is a named, typed write the app's UI can invoke on a bound entity. Actions are the only way for a viewer to mutate ontology rows, and they're audit-friendly because each call is one named operation.
+
+## Action kinds
+
+| Kind | Effect | Required binding mode |
+|------|--------|----------------------|
+| `insert_row` | Add a new row to the entity. | `write` or `readwrite` |
+| `patch_row` | Update specific columns on an existing row. | `write` or `readwrite` |
+| `delete_row` | Hide a row (overlay delete). | `write` or `readwrite` |
+
+A `read` binding rejects every write action. The check is server-side.
+
+## How an action flows
+
+1. The viewer clicks a button in the app—say "Mark as resolved" on a ticket.
+2. The app calls the action endpoint with the action kind, the entity, and the payload.
+3. The platform checks the [binding](/applications/bindings) mode and row-level security.
+4. The write lands as an overlay on the entity's source data (see [Edit rows](/ontology/edit-rows)).
+5. The next read—from any app, dashboard, or query—sees the change.
+
+Actions never modify the source Parquet that the pipeline produced. They live in the overlay, so a pipeline re-run won't clobber them.
+
+## Why the viewer can write here
+
+Apps are an **admin-approved write surface**: an admin authored the bindings and actions, the architect generated the UI, and viewers act inside those boundaries. Direct ontology row writes still require admin/owner—the action endpoint is the one place that permission is intentionally relaxed, and only within the binding's mode.

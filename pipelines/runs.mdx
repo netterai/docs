@@ -1,0 +1,45 @@
+---
+title: Runs
+description: Every execution of a pipeline is a Run. Runs can be started manually, by a schedule, or cascaded from an upstream refresh.
+---
+
+A **Run** is one execution of a pipeline (or a slice of it). Runs are scoped to a project and carry per-step status.
+
+## How runs start
+
+| Source | Description |
+|--------|-------------|
+| **Manual** | You click **Run all** on the project, or **Run step** to re-execute one branch. |
+| **Schedule** | A cron trigger attached to a `database` step fires on a schedule. |
+| **Cascade** | An upstream database is refreshed and downstream pipelines that depend on it auto-run. |
+
+## What runs
+
+The scope depends on how the run was started:
+
+- **Run all** — every root step in the project, cascading to all descendants.
+- **Run step** — the chosen step and its full downstream subtree. Useful for re-running a failed branch.
+- **Schedule / cascade** — the ancestor closure of the triggered `database` step (everything required to refresh that database).
+
+Steps at the same topological level run in parallel.
+
+## Run statuses
+
+| Status | Meaning |
+|--------|---------|
+| `running` | The run is in progress. |
+| `success` | All required steps finished successfully. |
+| `failed` | A required step errored; the run stopped. |
+| `cancelled` | The run was cancelled before completion. |
+
+Each step has its own status within a run: `pending`, `running`, `success`, `failed`, `skipped`, or `cancelled`.
+
+## Where to see them
+
+- **Project page** — recent runs for this project, with the latest status per step.
+- **Monitoring** — company-wide run feed, errors, and health. See [Monitoring](/pipelines/monitoring).
+- **Run timeline** — drill into a single run to see per-step duration, rows processed, and any error.
+
+## Cascade events
+
+Some cascades are skipped on purpose—for example, when the upstream database didn't actually change since the last successful refresh. These show up as **cascade events** on the project timeline (`muted`, `recent success`, `no change`, `race`) so you can see "would have re-run but didn't" without surprise.

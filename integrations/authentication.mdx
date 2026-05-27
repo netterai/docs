@@ -1,48 +1,46 @@
 ---
-title: Authentication methods
-description: API key, OAuth 2.0, and service account options for connecting integrations.
+title: Authentication
+description: The four auth modes integrations use, when each applies, and how to rotate credentials.
 ---
 
-Different integrations use different authentication methods. Choosing the right method—and managing credentials properly—affects both security and reliability.
+The catalog uses four auth modes. Each provider's tutorial calls out which one applies—this page is the reference.
 
-## API keys
+## OAuth 2.0 (via Nango)
 
-API keys are long-lived tokens issued by the external service. They are the simplest authentication method and work well for server-to-server connections where OAuth is not available.
-
-**When to use:** Services that issue personal access tokens or API keys (most developer tools, data APIs).
-
-**How to rotate:**
-
-1. Generate a new key in the external service.
-2. Go to **Integrations → [Integration name] → Credentials**.
-3. Paste the new key and click **Save**.
-4. Verify the connection still works, then revoke the old key in the external service.
-
-<Warning>
-  Rotating a key while the old one is still in use causes a brief period of failed syncs. Minimize this by saving the new key first and revoking the old key only after verifying the connection.
-</Warning>
-
-## OAuth 2.0
-
-OAuth 2.0 lets users authorize the platform to act on their behalf without sharing a password. The platform handles the token refresh cycle automatically.
-
-**When to use:** SaaS tools that support OAuth (CRMs, productivity tools, communication platforms).
+Most SaaS integrations (Gmail, Slack, Salesforce, Notion, GitHub, Databricks) use OAuth 2.0 brokered by Nango.
 
 **How it works:**
 
-1. Click **Authorize** on the connector setup page.
-2. You're redirected to the service's authorization screen.
-3. Sign in and approve the requested permissions.
-4. The platform stores the access token and refresh token securely.
+1. You click **Connect** on the provider card.
+2. You're redirected to the provider's consent screen.
+3. You sign in and approve the requested scopes.
+4. Nango stores the access and refresh tokens; the platform never sees the secret.
+5. Pipeline code calls `PROXY_URL/<provider>/...`; Nango refreshes the token on every call.
 
-OAuth tokens expire regularly. The platform refreshes them automatically before expiry. If the refresh fails (for example, because permissions were revoked), the integration shows a **Reconnect** prompt.
+**Redirect URL on the provider side:** `https://api.nango.dev/oauth/callback`. If you're creating the OAuth app yourself, that's the value to paste in.
 
-## Service accounts
+**Rotation:** OAuth refresh is automatic. If a token is revoked or scopes change, the integration flips to **Error** and shows a **Reconnect** prompt.
 
-Service accounts are non-personal identities created in the external system specifically for machine-to-machine access. Common with Google Cloud, AWS, and enterprise SaaS platforms.
+## JWT key-pair (via Nango)
 
-**When to use:** Situations where access must not be tied to an individual user (avoids disruption if an employee leaves), or where the service does not support OAuth.
+Snowflake uses Nango with a JWT key-pair instead of OAuth. You generate an RSA key pair, attach the public key to your Snowflake user, and provide the private key when you connect.
 
-**Setup:** Upload the credentials file (usually a JSON key or certificate) in the connector setup dialog. The platform stores it encrypted and uses it to authenticate all requests.
+**Rotation:** Generate a new key pair, attach the new public key in Snowflake, save the new private key in the integration. The connection picks up the new key on the next call.
 
-**Rotation:** Generate a new service account key in the external service, upload it to the connector, verify the connection, then deactivate the old key.
+## API key
+
+A few providers (INSEE, Pappers) use a long-lived API key. You paste the key into the connection form; it's stored encrypted server-side.
+
+**Rotation:** Generate a new key in the provider's console. Paste it into **Integrations → [Provider] → Credentials**. Verify it works, then revoke the old key in the provider.
+
+<Warning>
+  Rotating an API key while the old one is still in use causes a brief gap. Save the new key first, verify, then revoke the old one.
+</Warning>
+
+## Custom (host + credentials)
+
+PostgreSQL uses a host/port/database/username/password form. No OAuth, no third-party broker—the platform connects directly using `libpq`.
+
+**Network:** the provider must be reachable from the platform's outbound IPs. Add them to your firewall allowlist before testing the connection.
+
+**Rotation:** Update the password in your PostgreSQL instance, then update **Credentials** in the integration.

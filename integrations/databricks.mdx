@@ -1,0 +1,49 @@
+---
+title: Connect Databricks
+sidebarTitle: Databricks
+description: Connect a Databricks workspace via OAuth so pipelines can read Unity Catalog tables.
+---
+
+Databricks uses workspace-level OAuth brokered by Nango. The account-level OAuth flow is a separate, unsupported shape.
+
+## Prerequisites
+
+- An account or workspace admin on the Databricks side to register the OAuth app.
+- Your Databricks **Account ID** and the **workspace URL** you want to connect.
+
+## Set up the Databricks OAuth app
+
+Databricks's own docs are the source of truth here; Nango doesn't publish a step-by-step guide for this provider. In short:
+
+<Steps>
+  <Step title="Register a Custom OAuth App in the Databricks account console">
+    From the account console, create a **Custom OAuth App Integration**. Set the **Redirect URL** to:
+
+    ```
+    https://api.nango.dev/oauth/callback
+    ```
+  </Step>
+  <Step title="Pick scopes">
+    Choose scopes appropriate for the APIs your pipelines will call—typical picks include `all-apis`, `sql`, and `offline_access`. Refer to Databricks's OAuth docs for the current scope list.
+  </Step>
+  <Step title="Copy the Client ID + Client Secret">
+    Save these for the platform admin.
+  </Step>
+</Steps>
+
+## Connect
+
+Open the Databricks setup wizard from **Integrations → Databricks**. The form asks for two fields, plus the OAuth flow:
+
+| Field | What to enter |
+|-------|---------------|
+| **Account ID** | The account UUID from the dropdown next to your username in the top-right of the Databricks UI. |
+| **Workspace URL** | Your workspace, e.g. `https://<workspace>.cloud.databricks.com`. |
+
+Click **Connect**, authorize in Databricks, and you'll be returned to the app.
+
+## Gotchas
+
+- Databricks authenticates at both account and workspace levels. This integration is the **workspace** flow—`<workspace>.cloud.databricks.com` access, not cross-workspace admin.
+- Unity Catalog permissions must be granted to the OAuth app user separately. The OAuth grant is the gate to the API; UC grants are the gate to the data.
+- The default crawl cadence is 15 minutes (warehouses are billed per second). Tune per integration with a 5-minute floor.

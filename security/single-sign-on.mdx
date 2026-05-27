@@ -1,0 +1,81 @@
+---
+title: Single sign-on (SAML 2.0)
+sidebarTitle: SSO (SAML 2.0)
+description: Let your team sign in with their corporate identity provider—Microsoft Entra ID, Okta, Google Workspace, or any SAML 2.0 IdP.
+---
+
+Netter supports **SAML 2.0** single sign-on. Connect your identity provider (IdP) once and your team signs in with their existing corporate credentials. SAML authenticates **who** a user is; membership in a workspace comes from [SCIM provisioning](/security/scim-provisioning) or an explicit invitation.
+
+<Note>
+  Only workspace **owners** can manage SSO providers. Open **Settings → SSO**.
+</Note>
+
+## How it works
+
+1. An owner registers the IdP in **Settings → SSO**, supplying the IdP's entry point, signing certificate, and the email domain to claim.
+2. The owner proves domain ownership by publishing a DNS `TXT` record.
+3. Netter generates **service provider (SP) metadata** to hand to your IT team, who registers Netter as an enterprise app on the IdP side.
+4. Once the domain is verified, anyone with an email at that domain is routed to your IdP at sign-in.
+
+## Register your identity provider
+
+<Steps>
+  <Step title="Open the SSO settings">
+    Go to **Settings → SSO** and click **Add IdP**.
+  </Step>
+  <Step title="Fill in the IdP details">
+    Copy these from your IdP's SAML / federation metadata:
+
+    | Field | Where to find it (Entra ID example) |
+    |-------|-------------------------------------|
+    | **Provider ID** | A URL-safe slug you choose, e.g. `acme-entra`. Appears in the ACS URL—don't change it later. |
+    | **Email domain** | The domain to claim, e.g. `acme.com`. Users with this email domain are routed to this IdP. |
+    | **Issuer (Entity ID)** | "Microsoft Entra Identifier" on the SSO setup page. |
+    | **Sign-on URL (entryPoint)** | "Login URL". |
+    | **X.509 signing certificate** | "Certificate (Base64)" download—paste the full PEM including the `BEGIN`/`END` lines. |
+  </Step>
+  <Step title="Register">
+    Click **Register IdP**. The provider is created in a **Domain unverified** state and stays dormant until you verify ownership.
+  </Step>
+</Steps>
+
+## Verify your domain
+
+Expand the provider in the list. Under **Verify domain ownership** you'll see a DNS record to publish:
+
+| Record | Value |
+|--------|-------|
+| Type | `TXT` |
+| Hostname | `_better-auth-token-<provider-id>.<your-domain>` |
+| Value | The token shown on the page |
+
+Publish the record with your DNS host, then click **Verify domain**. Once verified, the badge flips to **Verified** and users at that domain can sign in via SSO.
+
+## Hand the SP metadata to your IT team
+
+Expand the provider and open **Service provider metadata**. Give your IT team either:
+
+- The full **SP metadata XML** (click **Copy XML**), or
+- The **ACS URL** directly:
+
+```
+https://<your-netter-domain>/api/auth/sso/saml2/sp/acs/<provider-id>
+```
+
+<Tip>
+  Copy the exact ACS URL shown on the page—it's generated from your workspace's domain and provider ID.
+</Tip>
+
+Netter sends the SP **Entity ID** as your Netter domain and requests signed assertions with the `emailAddress` NameID format. Most IdPs (Entra ID, Okta, Google Workspace) accept these defaults.
+
+## Google and other social sign-in
+
+Alongside SAML SSO, users can sign in with **Google** social login out of the box—no configuration required. Email/password sign-up is also available.
+
+<Warning>
+  A SAML sign-in only grants access if the user has been **SCIM-provisioned** or **invited**. A SAML user with no provisioned membership is rejected (`403`). This keeps enterprise tenancy flowing exclusively through SCIM and explicit invitations. See [SCIM provisioning](/security/scim-provisioning).
+</Warning>
+
+## Remove a provider
+
+Expand the provider and click **Remove provider**. Users at that domain lose SSO access immediately.

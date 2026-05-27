@@ -1,0 +1,53 @@
+---
+title: Connect Snowflake
+sidebarTitle: Snowflake
+description: Connect a Snowflake user via JWT key-pair auth so pipelines can read warehouse tables.
+---
+
+Snowflake uses **JWT key-pair authentication** through Nango—not OAuth. You generate an RSA key pair, attach the public key to a Snowflake user, and supply the private key when connecting.
+
+## Prerequisites
+
+- A Snowflake user with permission to use the warehouse and read the tables you need.
+- Access to a terminal with `openssl` for key generation.
+
+## Generate the key pair
+
+```bash
+openssl genrsa -out rsa_key.p8 2048
+openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
+```
+
+This produces:
+
+- `rsa_key.p8` — the **private key**. You'll paste its PEM contents into the connection form. Keep it secret.
+- `rsa_key.pub` — the **public key**. You'll attach this to the Snowflake user.
+
+## Attach the public key to your Snowflake user
+
+In a Snowflake worksheet, run:
+
+```sql
+ALTER USER <your_username> SET RSA_PUBLIC_KEY = '<contents of rsa_key.pub without header/footer>';
+```
+
+Replace `<your_username>` and paste the PEM body of `rsa_key.pub` (the lines between `-----BEGIN PUBLIC KEY-----` and `-----END PUBLIC KEY-----`, or the full PEM depending on your Snowflake version).
+
+## Connect
+
+Open the Snowflake setup wizard from **Integrations → Snowflake**. The form asks for four fields:
+
+| Field | What to enter |
+|-------|---------------|
+| **Subdomain** | The host prefix, e.g. `KXOPMLU-RE00572` from `KXOPMLU-RE00572.snowflakecomputing.com`. |
+| **Account Identifier** | From **Account → Account Details** in Snowflake. **Uppercase**, no region suffix. |
+| **User Name** | The Snowflake user the public key is attached to. **Uppercase**. |
+| **Private Key** | PEM contents of `rsa_key.p8`. |
+
+After saving, the wizard tests the connection by issuing a sample query.
+
+## Gotchas
+
+- **Uppercase matters.** `Account Identifier` and `User Name` must be uppercase. Snowflake's JWT auth fails silently if they're not.
+- **Role and warehouse.** Nango's connection does not set a default role or warehouse. Grant the user a usable role + warehouse out-of-band, or pipelines will run as a default role with no privileges.
+- The default crawl cadence is 15 minutes (Snowflake warehouses are billed per second). You can override per integration, with a 5-minute floor.

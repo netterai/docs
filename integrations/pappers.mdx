@@ -1,0 +1,43 @@
+---
+title: Connect Pappers
+sidebarTitle: Pappers
+description: Look up French company data via Pappers—better name search than INSEE, returns TVA and legal info directly. Credit-based pricing.
+---
+
+Pappers is a **custom** provider authenticated by API key. The platform calls Pappers directly using the key you supply.
+
+## Prerequisites
+
+- A Pappers account with API access.
+- A Pappers API key from [pappers.fr/api](https://www.pappers.fr/api).
+
+## Get the API key
+
+<Steps>
+  <Step title="Create a Pappers API account">
+    Sign up at [pappers.fr/api](https://www.pappers.fr/api).
+  </Step>
+  <Step title="Copy the key">
+    Copy the API key from your dashboard. Pappers uses credit-based pricing (≈ 0.1 credit per search)—choose a plan that matches the volume your pipelines will generate.
+  </Step>
+</Steps>
+
+## Connect
+
+From **Integrations → Pappers**, click **Connect**, paste the **Pappers API key**, and save.
+
+## What you get
+
+- Search by company **name** (covers both companies and individuals).
+- Look up by **SIREN** or **SIRET**.
+- Returns TVA number, registered address, legal category, and other public data directly—fewer follow-up calls than INSEE.
+
+## When to pick Pappers over INSEE
+
+- **Better name search** when SIRET/SIREN isn't known.
+- **TVA and richer legal info** in a single call.
+- Pappers charges credits per search; [INSEE](/integrations/insee) is free but rate-limited to 30 req/min. Use INSEE for high-volume SIRET lookups and Pappers for ad-hoc name searches.
+
+## Rotation
+
+Generate a new key in the Pappers dashboard, paste it into the **Credentials** form, verify, then revoke the old key.
