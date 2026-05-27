@@ -1,0 +1,39 @@
+---
+title: Promote a database
+description: Turn a raw project database into a typed ontology entity. Reversible via demote.
+---
+
+A project **database** is just a Parquet table written by a `data_sink` step. Promoting it turns the table into an **ontology entity** with a primary key, named properties, and a place in the company-wide object graph.
+
+## Before you begin
+
+- You must be **admin** or **owner** on the company.
+- The database must already have at least one successful run so the schema is known.
+
+## Promote
+
+<Steps>
+  <Step title="Open the database">
+    From **Ontology → Databases**, pick the source database. Tables are grouped by origin: from projects, from integrations, from files.
+  </Step>
+  <Step title="Pick the primary key">
+    Click **Promote**. For step-backed databases the platform uses `_row_key` automatically. For file-backed databases (CSV uploads), you choose which column identifies a row.
+  </Step>
+  <Step title="Name the entity">
+    Set the entity's display name (singular, business-y—"Customer", not "customers_table"). Properties are derived from the table's columns and can be renamed afterward.
+  </Step>
+</Steps>
+
+Once promoted, the entity is visible to dashboards, apps, and the natural-language query.
+
+## Demote
+
+Demoting drops the entity layer but keeps the underlying database intact. Use it when you promoted by mistake, or when the entity has been replaced by a different source.
+
+<Warning>
+  Demoting deletes all property and relationship metadata for the entity. Row overlays are also removed. The source database is untouched.
+</Warning>
+
+## Clear overlays
+
+If you've made manual edits via [row overlays](/ontology/edit-rows) and want to reset to whatever the pipeline produces, use **Clear overlays**. The entity stays promoted; only the overlay rows are dropped.

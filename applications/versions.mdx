@@ -1,0 +1,30 @@
+---
+title: Versions
+description: Every generation of an app produces a new version. Roll forward, compare, and revert.
+---
+
+Apps are versioned. Each generation (the initial create, every chat-driven refinement, every regenerate) writes a new **AppVersion** with the bundled JavaScript, the source files, and the generation metadata. The currently-served version is one of them.
+
+## What's in a version
+
+- Generated React/TypeScript files.
+- Bundled `bundle.js` (and any CSS).
+- Snapshot of the bindings and metadata used at generation time.
+
+The current version is denormalized onto the app itself (`bundle_url`, `bundle_css`, `bundle_imports`) so serving doesn't have to look up the version row on every request.
+
+## View history
+
+From the app designer, open **Versions** to see every past generation with timestamp, prompt summary, and status (`ready`, `error`, etc.).
+
+## Revert
+
+Pick any past `ready` version and click **Revert**. The platform marks that version as the current one and updates the served bundle in place. Bindings on the app stay as they are—revert is about the UI, not the data wiring.
+
+## Regenerate
+
+If you want a fresh build from the current chat history without changing prompts, **Regenerate** re-runs codegen against the latest spec. Use this after editing bindings, or to recover from a generation error.
+
+## Cancellation
+
+If a generation is taking too long, **Stop** flips the app back to its last good state. The lifecycle handles this carefully—an in-flight worker may still try to write, but the cancel is CAS-gated so stale writes are dropped.

@@ -1,0 +1,34 @@
+---
+title: Ontology
+sidebarTitle: Overview
+description: The ontology is your company-level business object model—entities, properties, and relationships built on top of the data your pipelines produce.
+---
+
+The **ontology** turns raw project databases into shared business objects. Where a pipeline produces a table (`customers.parquet`), the ontology promotes that table to a typed **entity** (`Customer`) with named **properties**, **relationships** to other entities, and a stable identity that the rest of the platform (apps, dashboards, queries) can rely on.
+
+## Concepts
+
+| Concept | What it is |
+|---------|------------|
+| **Entity** | A business object type (Customer, Invoice, Ticket). Backed by one project database. |
+| **Property** | A typed column on an entity (name, email, amount). |
+| **Relationship** | A directional link between two entities (Customer → Invoice). |
+| **Row overlay** | An admin-authored edit applied on top of the source data—insert, update, or delete a row without rewriting the pipeline. |
+
+Entities are **company-scoped**: one ontology per company, shared across all projects.
+
+## How it relates to pipelines
+
+A pipeline writes rows into a project **database** via a `data_sink` step. That database can stay as raw data, or you can **promote** it to an entity. Promoting locks in a primary key, exposes the table to apps and dashboards, and unblocks row-level editing.
+
+See [Promote a database](/ontology/promote-data).
+
+## What viewers see
+
+Viewers can browse entities, inspect related records (Customer → their Invoices), and run natural-language queries. They cannot create or modify entities, properties, or relationships—those operations are admin/owner only.
+
+## Next steps
+
+- [Promote a database](/ontology/promote-data) into an entity.
+- [Edit rows](/ontology/edit-rows) via overlays without touching the pipeline.
+- [Query in natural language](/ontology/query) against the entity graph.

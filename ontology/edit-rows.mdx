@@ -1,0 +1,34 @@
+---
+title: Edit rows
+description: Insert, update, or delete entity rows without rewriting the pipeline. Edits live as overlays on top of the source data.
+---
+
+Pipelines write rows; humans correct them. The ontology supports **row overlays**—admin-authored edits stored on top of the source data—so you don't have to change a pipeline to fix one bad row.
+
+## How overlays work
+
+Every entity has a source table (what the pipeline produced) and an overlay (what humans changed). When the platform reads the entity, the two are merged: overlay rows win on the entity's primary key.
+
+| Overlay operation | What it does |
+|-------------------|--------------|
+| **Insert** | Adds a row that isn't in the source. |
+| **Update** | Replaces specific column values on an existing source row. |
+| **Delete** | Hides a source row from all readers. |
+
+Overlays are stored separately from the source Parquet, so re-running the pipeline never destroys them.
+
+## Who can edit
+
+- **Direct** ontology row edits require **admin** or **owner** on the company.
+- **Viewers** can edit rows indirectly via an [Application](/applications/overview) whose entity binding has `write` or `readwrite` mode. The app's Action endpoint enforces row-level security; the underlying ontology operation does the write.
+
+## Clear overlays
+
+To revert an entity to its pipeline-produced state, use **Clear overlays** on the entity detail page. The source data is untouched—only the overlay table is reset.
+
+## Row identity
+
+- **Step-backed entities** use `_row_key`, the row identity column the platform stamps when the pipeline writes.
+- **File-backed entities** (CSV uploads) use the column you picked as primary key when you promoted the database.
+
+You don't manage `_row_key` directly—the platform generates and stamps it.

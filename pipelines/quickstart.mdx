@@ -1,0 +1,42 @@
+---
+title: Build a pipeline
+sidebarTitle: Quickstart
+description: Build your first pipeline by describing what you want in plain English. The AI Architect proposes the step DAG and you iterate.
+---
+
+A **pipeline** is a directed graph of **steps** that fetch, transform, and write data, optionally surfacing the result as a database or dashboard. You build pipelines inside a **project**.
+
+## Before you begin
+
+- A project to work in (create one from **Projects → New project**).
+- At least one connected integration if your pipeline starts from an external API. See [Integrations](/integrations/overview).
+
+## Steps
+
+<Steps>
+  <Step title="Open the AI Architect">
+    From your project, start a new chat. The Architect splits the screen: chat on the left, workflow graph on the right.
+  </Step>
+  <Step title="Describe what you want">
+    Type what the pipeline should do in plain English—for example, "Pull new Stripe invoices every hour, flag the ones above $10k, and write them to a dashboard."
+
+    The Architect proposes a step DAG with the right step types and pre-coded operators wired together.
+  </Step>
+  <Step title="Iterate on the graph">
+    Review the proposed steps. Ask the Architect to add, remove, or reconfigure steps. Each step in the graph shows its type, operator, and parents.
+
+    See [Step types](/pipelines/step-types) for what each role does and where it can sit in the DAG.
+  </Step>
+  <Step title="Deploy">
+    When the graph is right, deploy the project. Deploy creates the runtime resources (databases, dashboards) and makes the pipeline runnable.
+  </Step>
+  <Step title="Run it">
+    Trigger the pipeline with **Run all** from the project page, or attach a schedule to a database step so it refreshes on a cron. See [Runs](/pipelines/runs).
+  </Step>
+</Steps>
+
+## Next steps
+
+- Understand the [step types](/pipelines/step-types) and what they're allowed to do.
+- Pick the right [operators](/pipelines/operators) for ingest, transform, AI, and storage.
+- Configure [triggers](/pipelines/triggers) for scheduled and cascade refreshes.

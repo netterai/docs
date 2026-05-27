@@ -1,0 +1,46 @@
+---
+title: Connect INSEE SIRENE
+sidebarTitle: INSEE SIRENE
+description: Look up French company data—establishments, addresses, legal info—via the INSEE SIRENE API. Free, 30 requests per minute.
+---
+
+INSEE SIRENE is a **custom** provider authenticated by API key. The platform calls INSEE directly using the key you supply.
+
+## Prerequisites
+
+- An INSEE developer account.
+- An INSEE API key from the [INSEE developer portal](https://portail-api.insee.fr).
+
+## Get the API key
+
+<Steps>
+  <Step title="Create an INSEE developer account">
+    Sign up at [portail-api.insee.fr](https://portail-api.insee.fr).
+  </Step>
+  <Step title="Subscribe to the SIRENE API">
+    From the portal, subscribe your application to the **SIRENE API**.
+  </Step>
+  <Step title="Copy the key">
+    Generate or copy the API key from your application's credentials page.
+  </Step>
+</Steps>
+
+## Connect
+
+From **Integrations → INSEE SIRENE**, click **Connect**, paste the **INSEE API key**, and save.
+
+## What you get
+
+- Look up establishments by **SIRET** or **SIREN**.
+- Search by company name.
+- Enrich with official addresses, legal category (NAF/APE), creation date, and closure status.
+- Batch lookups up to **50 SIRETs per request**.
+
+## Limits
+
+- Free tier: **30 requests per minute**.
+- Pipelines that exceed the limit will get throttled responses. If you need higher throughput, schedule the pipeline with a wider cadence or batch lookups.
+
+## Rotation
+
+Generate a new key from the INSEE portal, paste it into the **Credentials** form, verify with a test call, then revoke the old key.

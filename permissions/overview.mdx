@@ -1,0 +1,64 @@
+---
+title: Permissions
+sidebarTitle: Overview
+description: Two layers control who can see and change what—company roles set the baseline, and resource permissions grant access to specific projects, databases, files, and integrations.
+---
+
+The platform separates **who you are in the company** from **what you can touch**. Company roles set the floor; resource permissions raise it for specific items.
+
+## Company roles
+
+Every member of a company has exactly one role:
+
+| Role | What it grants |
+|------|----------------|
+| **Owner** | Full access to everything in the company. Bypasses all permission checks and row-level security. |
+| **Admin** | Same operational surface as Owner—build pipelines, design apps, edit ontology, manage members. Subject to resource permissions and RLS where they apply. |
+| **Viewer** | Read-only by default. Can use apps, dashboards, and queries. Cannot edit pipelines, ontology, or settings. |
+
+Roles are assigned from **Settings → Team**. Only Owner and Admin can change them.
+
+## Resource permissions
+
+On top of the company role, individual resources carry their own access list. The resources that can be permissioned:
+
+| Resource | What permissions gate |
+|----------|----------------------|
+| **Project** | Whose pipelines, runs, and dashboards a member sees |
+| **Database** | Which tables a member can read |
+| **Files** | Access to uploaded files |
+| **Integrations** | Visibility into connected providers and credentials |
+
+Each grant has a **level**:
+
+| Level | Can do |
+|-------|--------|
+| **Viewer** | Read the resource. |
+| **Editor** | Read + modify. For projects, edit pipelines; for databases, write rows; for integrations, change config. |
+| **Admin** | Editor + manage permissions on this resource. |
+
+Levels are strictly ordered: `viewer < editor < admin`.
+
+## How the layers combine
+
+1. **Owner** short-circuits every check—no resource grants needed.
+2. Otherwise, the platform looks for a grant on the specific resource. If one exists, it uses that level.
+3. With no explicit grant, a viewer-role member has no access; an admin-role member has full operational access except where the resource carries explicit grants.
+
+## Auto-grants on create
+
+Whoever creates a project or a database gets an **Admin** grant on it automatically. They keep that grant until someone with Admin on the resource (or an Owner) revokes it.
+
+## Manage permissions
+
+From the resource's settings panel (project, database, file collection, or integration), use **Permissions** to:
+
+- Add a member at a chosen level.
+- Change an existing grant.
+- Revoke a grant.
+
+Only Owners and members with **Admin** on the resource can manage its permissions.
+
+## Next
+
+- [Row-level security](/permissions/row-level-security) controls which rows inside a permissioned database a member can see.

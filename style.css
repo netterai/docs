@@ -1,10 +1,97 @@
+/* ============================================================
+   NETTER DOCS — visual language synced with DMI_front design system
+   See DMI_front/DESIGN_SYSTEM.md for the source of truth.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;510;540;590;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
 :root {
-  --default-border-color: var(--gray-200);
+  /* Surfaces */
+  --dmi-bg:               #f7f8f8;
+  --dmi-bg-muted:         #f3f4f5;
+  --dmi-panel:            #ffffff;
+  --dmi-panel-alt:        #f5f6f7;
+  --dmi-surface:          rgba(15, 16, 17, 0.025);
+  --dmi-surface-strong:   rgba(15, 16, 17, 0.045);
+  --dmi-surface-hover:    rgba(15, 16, 17, 0.06);
+
+  /* Text */
+  --dmi-text:             #0f1011;
+  --dmi-secondary:        #3f4149;
+  --dmi-tertiary:         #6b6f76;
+  --dmi-quaternary:       #9ba0a7;
+
+  /* Borders */
+  --dmi-border:           rgba(15, 16, 17, 0.09);
+  --dmi-border-subtle:    rgba(15, 16, 17, 0.06);
+  --dmi-border-med:       rgba(15, 16, 17, 0.14);
+
+  /* Accent */
+  --dmi-accent:           #1C1C23;
+  --dmi-accent-hover:     #2a2a35;
+  --dmi-accent-soft:      rgba(28, 28, 35, 0.07);
+
+  /* Radius */
+  --dmi-radius-md:        8px;
+  --dmi-radius-lg:        10px;
+  --dmi-radius-xl:        12px;
+  --dmi-radius-2xl:       14px;
+  --dmi-radius-pill:      999px;
+
+  /* Shadows */
+  --dmi-shadow-soft:      0 1px 2px rgba(15, 16, 17, 0.04);
+
+  /* Motion */
+  --ease-out:             cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --dmi-duration-base:    0.15s;
+
+  /* Fonts */
+  --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, sans-serif;
+  --font-serif:   "Instrument Serif", "Iowan Old Style", "Apple Garamond", Georgia, serif;
+  --font-mono:    "Berkeley Mono", "SF Mono", Menlo, ui-monospace, monospace;
+
+  --default-border-color: var(--dmi-border);
 }
 
 .dark {
-  --default-border-color: var(--gray-800);
+  --default-border-color: rgba(255, 255, 255, 0.10);
 }
+
+/* ============================================================
+   Global typography
+   ============================================================ */
+
+body,
+#content-area,
+#sidebar {
+  font-family: var(--font-sans) !important;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tight tracking on headings — matches DESIGN_SYSTEM.md scale */
+#content-area h1 { letter-spacing: -0.042em; font-weight: 590; }
+#content-area h2 { letter-spacing: -0.025em; font-weight: 590; }
+#content-area h3 { letter-spacing: -0.018em; font-weight: 590; }
+#content-area h4 { letter-spacing: -0.015em; font-weight: 590; }
+
+/* Body text */
+#content-area p,
+#content-area li {
+  letter-spacing: -0.005em;
+}
+
+/* Inline code + code blocks — mono token */
+#content-area code,
+#content-area pre,
+#content-area kbd {
+  font-family: var(--font-mono) !important;
+}
+
+/* ============================================================
+   Sidebar — borderless dropdown triggers
+   ============================================================ */
 
 #sidebar .nav-dropdown-trigger {
   border: none !important;
@@ -14,7 +101,7 @@
 }
 
 #sidebar .nav-dropdown-trigger:hover {
-  background-color: rgb(0 0 0 / 0.04) !important;
+  background-color: var(--dmi-surface) !important;
 }
 
 .dark #sidebar .nav-dropdown-trigger:hover {
@@ -29,12 +116,6 @@
   padding: 0 !important;
 }
 
-.nav-dropdown-content {
-}
-
-.nav-dropdown-content .nav-dropdown-item {
-}
-
 .nav-dropdown-content .nav-dropdown-item-icon {
   border: none !important;
   background: transparent !important;
@@ -47,13 +128,18 @@
   display: none !important;
 }
 
+/* Section anchors styled like mono-label metadata chips */
 #sidebar .nav-anchor span {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
+  font-weight: 540;
+  letter-spacing: -0.005em;
+  text-transform: none;
 }
+
+/* ============================================================
+   Home page (Product Guide index)
+   ============================================================ */
 
 body:has([data-product-guide-index]) #sidebar a.nav-anchor[href='/'] {
   color: rgb(var(--primary)) !important;
@@ -77,7 +163,7 @@ body:has([data-product-guide-index]) #sidebar a.nav-anchor[href='/'] svg {
 }
 
 :is(#content-area[data-current-path='/'], [data-current-path='/'] #content-area):has([data-product-guide-index]) {
-  background: transparent !important;
+  background: var(--dmi-bg) !important;
   padding: 0 !important;
 }
 
@@ -88,27 +174,43 @@ body:has([data-product-guide-index]) #sidebar a.nav-anchor[href='/'] svg {
   padding-left: 0 !important;
 }
 
+/* Secondary card surfaces — matches dmi-panel + soft border */
 [data-product-guide-index] a:not(.product-guide-feature-card) {
-  background-color: #fafafa !important;
+  background-color: var(--dmi-panel) !important;
+  border-color: var(--dmi-border) !important;
+  box-shadow: var(--dmi-shadow-soft) !important;
+  transition: border-color var(--dmi-duration-base) var(--ease-out),
+              background-color var(--dmi-duration-base) var(--ease-out),
+              transform var(--dmi-duration-base) var(--ease-out);
+}
+
+[data-product-guide-index] a:not(.product-guide-feature-card):hover {
+  background-color: var(--dmi-panel) !important;
+  border-color: var(--dmi-border-med) !important;
 }
 
 .dark [data-product-guide-index] a:not(.product-guide-feature-card) {
-  background-color: #09090b !important;
+  background-color: #0a0a0e !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
+/* Featured card — Pipelines hero — charcoal gradient instead of marketing image */
 .product-guide-feature-card {
   grid-column: 1 / -1;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  min-height: 260px;
-  background: url('/images/sample-feature-light.png') center / cover no-repeat !important;
-  border: none !important;
-  box-shadow: none !important;
+  min-height: 220px;
+  background: linear-gradient(180deg, #1C1C23, #101018) !important;
+  border: 1px solid var(--dmi-border-med) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 2px 6px rgba(15, 16, 17, 0.20) !important;
   color: white !important;
-  .dark & {
-    background-image: url('/images/sample-feature-dark.png') !important;
-  }
+  border-radius: var(--dmi-radius-2xl) !important;
+}
+
+.dark .product-guide-feature-card {
+  background: linear-gradient(180deg, #1C1C23, #050507) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .product-guide-feature-card > div {
@@ -131,19 +233,23 @@ body:has([data-product-guide-index]) #sidebar a.nav-anchor[href='/'] svg {
 
 .product-guide-feature-card-title {
   font-size: 1.2em;
-  font-weight: 500;
+  font-weight: 540;
+  letter-spacing: -0.02em;
 }
 
 .product-guide-feature-card :is(h2, h3, p, span, svg).product-guide-feature-card-description {
   font-size: 1.05em;
   font-weight: 400;
+  letter-spacing: -0.005em;
   color: rgb(var(--gray-50) / 62.5%) !important;
-  .dark & {
-    color: rgb(var(--gray-50) / 50%) !important;
-  }
 }
 
-img.nav-logo {
-  max-width: 220px;
+/* ============================================================
+   Logo sizing
+   ============================================================ */
+
+img.nav-logo,
+svg.nav-logo {
+  max-width: 96px;
   height: auto;
 }

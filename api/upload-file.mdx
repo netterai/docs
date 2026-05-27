@@ -1,0 +1,109 @@
+---
+title: Upload a file
+sidebarTitle: Upload a file
+description: Push a CSV, JSON, or Excel file into your workspace with a single API call.
+---
+
+Upload a file to your workspace. On success, Netter stores the file and starts turning it into a queryable database.
+
+```
+POST /api/v1/files/upload
+```
+
+## Request
+
+Send the file as `multipart/form-data` in a field named `file`, with your [API key](/api/api-keys) in the `Authorization` header.
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer ntr_…`—your API key.
+</ParamField>
+
+<ParamField body="file" type="file" required>
+  The file to upload. Allowed types: **CSV**, **JSON**, **XLSX**. Maximum size **50 MB**.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.netter.ai/api/v1/files/upload \
+  -H "Authorization: Bearer ntr_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -F "file=@data.csv"
+```
+
+```python Python
+import requests
+
+with open("data.csv", "rb") as f:
+    resp = requests.post(
+        "https://api.netter.ai/api/v1/files/upload",
+        headers={"Authorization": "Bearer ntr_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"},
+        files={"file": ("data.csv", f, "text/csv")},
+    )
+
+resp.raise_for_status()
+print(resp.json())
+```
+
+```javascript Node.js
+import { readFile } from "node:fs/promises";
+
+const file = new Blob([await readFile("data.csv")], { type: "text/csv" });
+const form = new FormData();
+form.append("file", file, "data.csv");
+
+const resp = await fetch("https://api.netter.ai/api/v1/files/upload", {
+  method: "POST",
+  headers: { Authorization: "Bearer ntr_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
+  body: form,
+});
+
+if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+console.log(await resp.json());
+```
+
+</CodeGroup>
+
+<Tip>
+  Calling from an IP-allowlisted network? Swap `api.netter.ai` for `ingest.netter.ai` to use Netter's [static IPs](/api/overview#connecting-from-an-ip-allowlisted-network). The same key works on both.
+</Tip>
+
+## Response
+
+Returns `201 Created`. The `state` field tells you what happened next.
+
+<ResponseField name="id" type="string">
+  The uploaded file's ID.
+</ResponseField>
+<ResponseField name="name" type="string">
+  The stored filename.
+</ResponseField>
+<ResponseField name="file_type" type="string">
+  `csv`, `json`, or `xlsx`.
+</ResponseField>
+<ResponseField name="size_bytes" type="integer">
+  Size of the uploaded file.
+</ResponseField>
+<ResponseField name="replaced" type="boolean">
+  `true` if this upload replaced an existing file with the same name.
+</ResponseField>
+<ResponseField name="state" type="string">
+  `committed` (parsed automatically) or `pending` (needs confirmation in the **Files** view in the app).
+</ResponseField>
+<ResponseField name="databases" type="array">
+  Present when `state` is `committed`. Each entry has `id`, `name`, and `refresh_status` for the database being created from the file.
+</ResponseField>
+<ResponseField name="sheets" type="array">
+  Present when `state` is `pending`. The detected sheets and headers awaiting confirmation.
+</ResponseField>
+
+## Errors
+
+| Status | Meaning |
+|--------|---------|
+| `400 Bad Request` | Missing filename, unsupported file type, empty file, or malformed JSON. |
+| `401 Unauthorized` | Missing `Authorization` header, or an invalid/revoked API key. |
+| `403 Forbidden` | The key's user isn't assigned to a company, or lacks edit permission on files. |
+| `413 Payload Too Large` | File exceeds the 50 MB limit. |
+| `429 Too Many Requests` | More than 10 uploads in a minute. Retry after a short wait. |

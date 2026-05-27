@@ -1,0 +1,35 @@
+---
+title: Query in natural language
+description: Ask questions across the entity graph in plain English. The platform writes the SQL.
+---
+
+The ontology surfaces a **natural-language query** entry point. You type a question; the platform plans the SQL across the entity graph, runs it, and returns the rows.
+
+## How to use it
+
+<Steps>
+  <Step title="Open the query tab">
+    Go to **Ontology → Query**.
+  </Step>
+  <Step title="Ask">
+    Type a question that references entities and their properties. The platform names what's available; you don't have to remember table names.
+
+    Examples:
+    - "Which customers signed up last week and haven't logged in since?"
+    - "Top 10 invoices by amount, with the customer name."
+    - "Tickets created in the last 30 days, grouped by priority."
+  </Step>
+  <Step title="Inspect the result">
+    The result panel shows the generated SQL and the returned rows. If the answer is wrong, refine the question—the platform retries up to three times if a query fails.
+  </Step>
+</Steps>
+
+## Scope
+
+Queries run as **SELECT** statements over the merged entity views (source + overlays). Writes go through [row overlays](/ontology/edit-rows) or [Application actions](/applications/actions), not through the query path.
+
+Row-level security is enforced in the generated SQL. A viewer sees only the rows their role grants access to.
+
+## Relationships
+
+Because entities carry typed relationships, questions like "customers' invoices last quarter" resolve without you specifying a join—the platform knows the edge between `Customer` and `Invoice`. Add or fix relationships from the entity detail page if a question can't be answered the way you expect.

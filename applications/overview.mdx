@@ -1,0 +1,32 @@
+---
+title: Applications
+sidebarTitle: Overview
+description: Apps are AI-generated React surfaces that read and write ontology entities. Admins design them; viewers use them.
+---
+
+An **application** is a custom UI an admin designs through chat and a viewer uses to do their day-to-day work. Where a dashboard shows numbers, an app **acts**: it edits rows, kicks off side effects, and writes back to ontology entities.
+
+Apps are **company-scoped**—not tied to a single project. One app can read across several entities and write to others.
+
+## Who does what
+
+| Role | Can do |
+|------|--------|
+| **Admin / owner** | Create and refine apps via chat. Configure entity bindings and actions. |
+| **Viewer** | Open the app and use it—including writing rows through approved actions, even though direct ontology edits require admin. |
+
+The Action endpoint is deliberately the write surface for viewers: an app is an admin-approved write boundary, not a free-for-all.
+
+## What an app contains
+
+- **Bindings** — which entities the app reads from or writes to, and at what mode (`read`, `write`, `readwrite`).
+- **Actions** — typed write operations (insert row, patch row, delete row) the app's UI calls.
+- **Generated UI** — React/TypeScript bundled at deploy time. You don't author the JSX; the architect does, from your chat description.
+- **Versions** — every generation produces a new version; you can revert at any time.
+
+## Next steps
+
+- [Build an app](/applications/build) from chat.
+- Configure [entity bindings](/applications/bindings) to control what the app can touch.
+- Understand [actions](/applications/actions) and the viewer write path.
+- Use [versions](/applications/versions) to roll forward and back.

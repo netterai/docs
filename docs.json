@@ -4,19 +4,16 @@
   "name": "Product Guide",
   "description": "Step-by-step guides for every product—platform setup, analytics, and integrations in one place.",
   "colors": {
-    "primary": "#166E3F",
-    "light": "#26BD6C",
-    "dark": "#166E3F"
+    "primary": "#1C1C23",
+    "light": "#2a2a35",
+    "dark": "#1C1C23"
   },
-  "favicon": "/favicon.ico",
+  "favicon": "/favicon.svg",
   "icons": {
     "library": "lucide"
   },
   "styling": {
     "eyebrows": "breadcrumbs"
-  },
-  "contextual": {
-    "options": ["copy", "view", "assistant", "mcp", "add-mcp"]
   },
   "navigation": {
     "global": {
@@ -25,42 +22,72 @@
           "anchor": "Home",
           "icon": "house",
           "href": "/"
-        },
-        {
-          "anchor": "Changelog",
-          "icon": "scroll-text",
-          "href": "https://www.mintlify.com/docs/changelog"
-        },
-        {
-          "anchor": "Help",
-          "icon": "life-buoy",
-          "href": "https://www.mintlify.com/docs/contact-support"
         }
       ]
     },
     "directory": "card",
     "groups": [
       {
-        "group": "Platform",
-        "icon": "layers",
+        "group": "Pipelines",
+        "icon": "workflow",
         "expanded": true,
         "pages": [
-          "platform/quickstart",
-          "platform/key-concepts",
-          "platform/configuration/settings",
-          "platform/configuration/user-management",
-          "platform/administration/roles-permissions"
+          "pipelines/quickstart",
+          "pipelines/step-types",
+          "pipelines/operators",
+          "pipelines/triggers",
+          "pipelines/runs"
         ]
       },
       {
-        "group": "Analytics",
-        "icon": "chart-bar",
+        "group": "Ontology",
+        "icon": "shapes",
         "expanded": true,
         "pages": [
-          "analytics/quickstart",
-          "analytics/connect-data",
-          "analytics/dashboards/create-dashboard",
-          "analytics/reports/scheduled-reports"
+          "ontology/overview",
+          "ontology/promote-data",
+          "ontology/edit-rows",
+          "ontology/query"
+        ]
+      },
+      {
+        "group": "Applications",
+        "icon": "layout-dashboard",
+        "expanded": true,
+        "pages": [
+          "applications/overview",
+          "applications/build",
+          "applications/bindings",
+          "applications/actions",
+          "applications/versions"
+        ]
+      },
+      {
+        "group": "Permissions",
+        "icon": "shield-check",
+        "expanded": true,
+        "pages": [
+          "permissions/overview",
+          "permissions/row-level-security"
+        ]
+      },
+      {
+        "group": "Security",
+        "icon": "lock",
+        "expanded": true,
+        "pages": [
+          "security/single-sign-on",
+          "security/scim-provisioning"
+        ]
+      },
+      {
+        "group": "API",
+        "icon": "code",
+        "expanded": true,
+        "pages": [
+          "api/overview",
+          "api/api-keys",
+          "api/upload-file"
         ]
       },
       {
@@ -68,10 +95,24 @@
         "icon": "plug",
         "expanded": true,
         "pages": [
-          "integrations/quickstart",
+          "integrations/overview",
           "integrations/authentication",
-          "integrations/connectors/crm",
-          "integrations/webhooks/configure"
+          {
+            "group": "Connectors",
+            "icon": "blocks",
+            "pages": [
+              "integrations/gmail",
+              "integrations/slack",
+              "integrations/salesforce",
+              "integrations/notion",
+              "integrations/github",
+              "integrations/snowflake",
+              "integrations/databricks",
+              "integrations/postgresql",
+              "integrations/insee",
+              "integrations/pappers"
+            ]
+          }
         ]
       }
     ]
@@ -90,8 +131,7 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/yourcompany",
-      "linkedin": "https://linkedin.com/company/yourcompany"
+      "linkedin": "https://www.linkedin.com/company/netterai"
     }
   }
 }

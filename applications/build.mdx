@@ -1,0 +1,36 @@
+---
+title: Build an app
+description: Describe the surface you want in chat; the architect generates React, bundles it, and serves it back to the company.
+---
+
+You build apps the same way you build pipelines: describe what you want, the architect proposes a design, you iterate.
+
+## Before you begin
+
+- **Admin** or **owner** on the company.
+- The entities the app needs to read or write are already promoted in the [ontology](/ontology/overview).
+
+## Steps
+
+<Steps>
+  <Step title="Create the app">
+    Go to **Apps → New app**. Give it a name and an initial chat description: who uses it, what they're doing, which entities matter.
+  </Step>
+  <Step title="Iterate in chat">
+    The architect proposes a UI layout and the entity bindings it needs. Ask for changes—"add a status filter", "split into two tabs", "make the priority column editable". Each turn regenerates the app.
+  </Step>
+  <Step title="Configure bindings and actions">
+    Confirm which entities the app can read or write. See [bindings](/applications/bindings) for the rules around `read`, `write`, and `readwrite` modes.
+  </Step>
+  <Step title="Publish">
+    Once you're happy, viewers can open the app from the **Apps** list. The view mode is a chrome-free iframe; the designer mode is admin-only.
+  </Step>
+</Steps>
+
+## Lifecycle
+
+While the architect is generating, the app's status moves through `pending_codegen → generating → ready`. If the chat is updated mid-generation, the in-flight build is superseded—the new turn wins. A failed generation lands in `error`; you can retry from the same chat.
+
+## What gets generated
+
+The architect produces React/TypeScript source that imports the platform's UI primitives and binding hooks. The code is bundled to JavaScript at deploy time and served from `bundle.js`. You don't run a build locally; everything happens in the platform.

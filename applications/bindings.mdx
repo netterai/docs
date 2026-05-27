@@ -1,0 +1,35 @@
+---
+title: Entity bindings
+description: Bindings declare which entities an app touches and at what permission level. They're the security boundary for viewer writes.
+---
+
+A **binding** wires an app to an ontology entity. Each binding has a **mode** that decides what the app's UI can do with that entity.
+
+## Modes
+
+| Mode | Reads | Writes |
+|------|-------|--------|
+| `read` | ✅ | ❌ |
+| `write` | ❌ | ✅ |
+| `readwrite` | ✅ | ✅ |
+
+A `read`-only binding cannot invoke any write [action](/applications/actions). Mode is checked server-side before the action runs—it's not just a UI hint.
+
+## Where bindings come from
+
+The architect proposes bindings based on what the app needs. You confirm them when the app is generated, and you can adjust them later from the app's settings.
+
+## How viewers gain write access
+
+Viewers can't write to ontology entities directly. Bindings are the controlled exception:
+
+1. An admin creates an app with a `write` or `readwrite` binding for an entity.
+2. The app exposes [actions](/applications/actions) (`insert_row`, `patch_row`, `delete_row`) on that entity.
+3. A viewer triggers the action through the app UI.
+4. The platform enforces the binding's mode plus row-level security from the company's permissions model.
+
+Removing the binding (or downgrading to `read`) revokes that viewer-side write path immediately.
+
+## Querying through bindings
+
+Apps can also run **SELECT-only** SQL across their bound entities through the app query endpoint. The query is sandboxed: only tables matching active bindings are reachable, and row-level security is applied as a `WHERE` wrapper. Use this for grids, search, or any read-heavy panel the architect generates.

@@ -1,0 +1,59 @@
+---
+title: Connect Salesforce
+sidebarTitle: Salesforce
+description: Connect a Salesforce org via OAuth so pipelines can read and write CRM objects.
+---
+
+Salesforce uses OAuth 2.0 brokered by Nango. Nango's current recommendation is to register an **External Client App** (ECA), not the legacy Connected App—Salesforce is phasing the latter out.
+
+## Prerequisites
+
+- A Salesforce org (production or sandbox) with permission to create External Client Apps.
+
+## Set up the External Client App
+
+<Steps>
+  <Step title="Create the ECA">
+    In Salesforce, open **Setup → App Manager → New External Client App**. Set **Distribution State** to **Local** for internal use, or **Packaged** if you need to distribute it to other orgs.
+  </Step>
+  <Step title="Set the callback URL">
+    Add this **Callback URL** exactly:
+
+    ```
+    https://api.nango.dev/oauth/callback
+    ```
+  </Step>
+  <Step title="Pick scopes">
+    Select at minimum:
+    - **`api`** — "Manage user data via APIs"
+    - **`refresh_token, offline_access`** — "Perform requests on your behalf at any time"
+
+    Add more (e.g. `chatter_api`, `wave_api`) only if a pipeline needs them.
+  </Step>
+  <Step title="Leave the secret-required settings on">
+    Under security settings keep the defaults: **Require Secret for Web Server Flow**, **Require Secret for Refresh Token Flow**, **Require PKCE**, and enable **Authorization Code and Credentials Flow**.
+  </Step>
+  <Step title="Configure refresh policy">
+    Under **Policies**, set **Refresh Token Policy** to **"Refresh token is valid until revoked"** for long-lived access.
+  </Step>
+  <Step title="Copy credentials">
+    Save the ECA, then under **Settings → OAuth Settings** copy the **Consumer Key** (Client ID) and **Consumer Secret** (Client Secret) for the platform admin.
+  </Step>
+</Steps>
+
+## Connect
+
+<Steps>
+  <Step title="Pick the hostname">
+    From **Integrations → Salesforce**, click **Connect**. If you're connecting a sandbox, set the optional **hostname** field to `test.salesforce.com` (or your sandbox My Domain URL). Leave it blank to use the default `login.salesforce.com`.
+  </Step>
+  <Step title="Authorize">
+    Sign in to Salesforce, approve the scopes, and you'll be returned to the app.
+  </Step>
+</Steps>
+
+## Gotchas
+
+- Connecting a sandbox without overriding the hostname routes you to production and fails. The hostname field is the lever.
+- The ECA flow replaces the old Connected App. If your Salesforce org admin already created a Connected App for Nango, migrate to an ECA—Salesforce is sunsetting Connected Apps.
+- API limits are per-org. Schedule pipelines so a single org's daily quota isn't exhausted by background syncs.

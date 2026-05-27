@@ -1,0 +1,53 @@
+---
+title: Connect Slack
+sidebarTitle: Slack
+description: Connect a Slack workspace via OAuth so pipelines can read messages, post replies, and react to events.
+---
+
+Slack uses OAuth 2.0 brokered by Nango. To enable it for your company, an admin registers a Slack app and supplies its credentials—the OAuth dance then runs against your app.
+
+## Prerequisites
+
+- A Slack workspace you can install apps in (admin permission).
+
+## Set up the Slack app
+
+<Steps>
+  <Step title="Create the app">
+    At [api.slack.com/apps](https://api.slack.com/apps), click **Create New App → From scratch**. Pick a name and a development workspace.
+  </Step>
+  <Step title="Copy credentials">
+    From **Basic Information**, copy the **Client ID** and **Client Secret**—the platform admin needs these to wire up the provider.
+  </Step>
+  <Step title="Add the redirect URL">
+    Under **OAuth & Permissions → Redirect URLs**, add:
+
+    ```
+    https://api.nango.dev/oauth/callback
+    ```
+  </Step>
+  <Step title="Pick scopes">
+    Still under **OAuth & Permissions**, configure:
+    - **Bot Token Scopes** — what the bot user can do (granted at install). Typical picks: `channels:read`, `chat:write`, `users:read`, `files:read`.
+    - **User Token Scopes** — what the installing user can do (granted per connection). Add only if a sync explicitly needs them.
+
+    Match the scope list to the syncs and actions your pipelines will use; over-scoping triggers re-consent every time you change it.
+  </Step>
+  <Step title="Enable public distribution">
+    Under **Manage Distribution**, enable **Public Distribution** if you want to install the app into workspaces other than your dev workspace.
+  </Step>
+</Steps>
+
+## Connect
+
+<Steps>
+  <Step title="Authorize">
+    From **Integrations → Slack**, click **Connect**, sign in to your workspace, and approve the requested scopes.
+  </Step>
+</Steps>
+
+## Gotchas
+
+- Changing scopes after install requires reauthorization—users will see a fresh consent screen.
+- The Events API (for webhooks/event-driven syncs) needs separate configuration under **Event Subscriptions**.
+- Slack rate-limits aggressively per scope; tune pipeline cadence accordingly.

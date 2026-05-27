@@ -1,0 +1,46 @@
+---
+title: Connect Notion
+sidebarTitle: Notion
+description: Connect a Notion workspace via OAuth so pipelines can read and write pages and databases.
+---
+
+Notion uses OAuth 2.0 brokered by Nango. To enable it for your company, an admin registers a **public** Notion integration—internal integrations don't support OAuth across workspaces.
+
+## Prerequisites
+
+- A Notion workspace owner role (only owners can publish public integrations).
+
+## Set up the Notion integration
+
+<Steps>
+  <Step title="Create the integration">
+    Go to [notion.so/my-integrations](https://www.notion.so/my-integrations) and click **+ New integration**.
+  </Step>
+  <Step title="Switch type to Public">
+    The default is **Internal**. Change **Integration Type** to **Public** so other workspaces can install it via OAuth.
+  </Step>
+  <Step title="Add the redirect URI">
+    Set the OAuth **Redirect URI** to:
+
+    ```
+    https://api.nango.dev/oauth/callback
+    ```
+  </Step>
+  <Step title="Configure capabilities">
+    Notion has **no OAuth scope parameter**—access is controlled by **capabilities** you check on the integration page (read content, update content, insert content, read user info). Enable only what pipelines need.
+  </Step>
+</Steps>
+
+## Connect
+
+<Steps>
+  <Step title="Authorize">
+    From **Integrations → Notion**, click **Connect**, sign in, and select which workspace and pages to share with the integration.
+  </Step>
+</Steps>
+
+## Gotchas
+
+- **No refresh tokens.** Notion's OAuth access token doesn't expire, but there's also no rotation flow—if you need to revoke, do it on Notion's side and reconnect.
+- **Page-level sharing required.** After OAuth, users must explicitly share each page or database with the integration. Pages that haven't been shared are invisible, even with broad capabilities.
+- Only workspace owners can publish a public integration. Members can't.

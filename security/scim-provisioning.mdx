@@ -1,0 +1,51 @@
+---
+title: SCIM provisioning
+sidebarTitle: SCIM provisioning
+description: Automate user lifecycle—provision and deprovision members from your identity provider with SCIM 2.0.
+---
+
+Netter supports **SCIM 2.0** so your identity provider (Okta, Microsoft Entra ID, etc.) can create and remove workspace members automatically. SCIM is how enterprise users gain membership: a [SAML sign-in](/security/single-sign-on) authenticates an identity, but the user must be SCIM-provisioned (or invited) to actually belong to a workspace.
+
+<Note>
+  SCIM tokens are scoped to **one company at a time**. Generate the token while the company you want to provision into is active. Open **Settings → SCIM tokens**.
+</Note>
+
+## Generate a SCIM token
+
+<Steps>
+  <Step title="Open SCIM tokens">
+    Go to **Settings → SCIM tokens**.
+  </Step>
+  <Step title="Create a token">
+    Enter a name for the connection—use the IdP it's for, e.g. `okta-production`—and click **Create token**.
+  </Step>
+  <Step title="Copy the token now">
+    The token is shown **once**. Copy it immediately; you can't retrieve it later.
+  </Step>
+</Steps>
+
+## Configure your IdP
+
+In your IdP's SCIM provisioning settings, use:
+
+| Setting | Value |
+|---------|-------|
+| SCIM endpoint (Base URL) | `https://<your-netter-domain>/api/auth/scim/v2` |
+| Authentication | HTTP header (Bearer token) |
+
+Every SCIM request must send:
+
+```http
+Authorization: Bearer <your-token>
+Content-Type: application/scim+json
+```
+
+<Tip>
+  Copy the exact endpoint URL shown on the **SCIM tokens** page—it's built from your workspace's domain.
+</Tip>
+
+Supported resource: **`/Users`**. As your IdP assigns or unassigns users from the Netter app, they're provisioned into—or removed from—the token's company.
+
+## Revoke a token
+
+On the **SCIM tokens** page, click **Revoke** next to a connection. Your IdP loses provisioning access immediately. Existing members are unaffected.

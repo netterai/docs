@@ -1,0 +1,53 @@
+---
+title: Connect GitHub
+sidebarTitle: GitHub
+description: Connect a GitHub user or organization via an OAuth App so pipelines can read repositories, issues, and workflows.
+---
+
+GitHub uses OAuth 2.0 brokered by Nango. Two GitHub auth shapes exist (OAuth App and GitHub App); this integration uses the **OAuth App** flow.
+
+## Prerequisites
+
+- A GitHub account or organization where you can create developer apps. For org-owned OAuth Apps, an org owner must do the setup.
+
+## Set up the OAuth App
+
+<Steps>
+  <Step title="Create the OAuth App">
+    Go to **Profile → Settings → Developer settings → OAuth Apps → New OAuth App**.
+  </Step>
+  <Step title="Fill in the fields">
+    - **Application name** — anything recognizable to your users.
+    - **Homepage URL** — your app's public URL.
+    - **Authorization callback URL** — paste exactly:
+
+      ```
+      https://api.nango.dev/oauth/callback
+      ```
+  </Step>
+  <Step title="Generate a client secret">
+    After saving, click **Generate a new client secret** and store the **Client ID** + **Client Secret** for the platform admin.
+  </Step>
+</Steps>
+
+## Scopes
+
+OAuth Apps use **classic GitHub scopes** (not fine-grained permissions). Pick what the pipelines actually call—typical sets:
+
+- `repo` — read/write private repositories
+- `read:org` — read org membership
+- `user:email` — read primary email
+- `workflow` — manage Actions workflows
+
+## Connect
+
+<Steps>
+  <Step title="Authorize">
+    From **Integrations → GitHub**, click **Connect**, sign in, and approve the requested scopes.
+  </Step>
+</Steps>
+
+## Gotchas
+
+- The OAuth App is distinct from a GitHub App. If you already set up a GitHub App for some other Nango integration, you still need a separate OAuth App for this one.
+- GitHub's rate limit is per token; chatty pipelines should authenticate as an app/installation if higher limits are needed (a future integration shape).

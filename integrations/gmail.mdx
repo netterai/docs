@@ -1,0 +1,55 @@
+---
+title: Connect Gmail
+sidebarTitle: Gmail
+description: Connect a Gmail account via Google OAuth so pipelines can read or send mail.
+---
+
+Gmail uses OAuth 2.0 brokered by Nango. To enable it for your company, an admin must register an OAuth client in a Google Cloud project—the OAuth dance then runs against your own client.
+
+## Prerequisites
+
+- A **Google Cloud project** you control.
+- A Google Workspace admin (only if you want **Internal** distribution restricted to your domain).
+
+## Set up the Google OAuth app
+
+<Steps>
+  <Step title="Enable the Gmail API">
+    In the Google Cloud console, open **APIs & Services → Library** and enable the **Gmail API** for your project.
+  </Step>
+  <Step title="Configure the OAuth consent screen">
+    Under **APIs & Services → OAuth consent screen**, choose audience:
+    - **Internal** to restrict to your Workspace.
+    - **External** to allow any Google user. External apps start in Testing; to leave Testing you'll need Google OAuth verification (and a CASA assessment for restricted scopes).
+  </Step>
+  <Step title="Create an OAuth client">
+    Under **APIs & Services → Credentials**, click **Create credentials → OAuth client ID**. Application type **Web application**. Add this authorized redirect URI exactly:
+
+    ```
+    https://api.nango.dev/oauth/callback
+    ```
+
+    Save the **Client ID** and **Client secret**—the platform admin needs these to wire up the provider.
+  </Step>
+</Steps>
+
+## Scopes
+
+Pick scopes from `https://www.googleapis.com/auth/gmail.*` based on what pipelines actually need (for example `gmail.readonly`, `gmail.send`, `gmail.modify`). Most Gmail scopes are flagged **sensitive** or **restricted** by Google and trigger additional verification before non-test users can connect.
+
+## Connect
+
+<Steps>
+  <Step title="Open Integrations">
+    Go to **Integrations** and find the **Gmail** card.
+  </Step>
+  <Step title="Authorize">
+    Click **Connect**. You'll be redirected to Google's consent screen. Sign in, approve the scopes, and you'll be returned to the app.
+  </Step>
+</Steps>
+
+## Gotchas
+
+- The redirect URI must match `https://api.nango.dev/oauth/callback` exactly—Google rejects anything else.
+- While the app is in Testing, only listed test users can connect. Publish before rolling out to viewers.
+- Push notifications (webhooks) need a separate Google Pub/Sub setup—out of scope for the basic connection.

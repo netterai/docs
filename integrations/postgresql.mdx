@@ -1,0 +1,52 @@
+---
+title: Connect PostgreSQL
+sidebarTitle: PostgreSQL
+description: Connect any PostgreSQL database via host and credentials. No OAuth broker involved.
+---
+
+PostgreSQL is a **custom** provider—no Nango, no OAuth. The platform connects directly using the host, port, database name, username, and password you supply.
+
+## Prerequisites
+
+- A PostgreSQL database reachable from the platform's outbound IPs.
+- A database user with SELECT privileges on the tables your pipelines will read.
+
+## Connect
+
+From **Integrations → PostgreSQL**, click **Connect** to open the credentials form:
+
+| Field | Example |
+|-------|---------|
+| **Host** | `db.example.com` |
+| **Port** | `5432` |
+| **Database** | `mydb` |
+| **Username** | `pipeline_reader` |
+| **Password** | (set on the PostgreSQL side) |
+
+Click **Test connection**; on success the integration is saved encrypted.
+
+## Network
+
+The database must accept connections from the platform's outbound IPs. If your PostgreSQL is behind a firewall:
+
+1. Get the outbound IP list from your account team (or **Integrations → Network info**).
+2. Add those IPs to `pg_hba.conf` or your cloud-provider security group.
+3. Re-test the connection.
+
+## Privileges
+
+Create a dedicated read-only user for pipelines:
+
+```sql
+CREATE ROLE pipeline_reader LOGIN PASSWORD '<strong-password>';
+GRANT CONNECT ON DATABASE mydb TO pipeline_reader;
+GRANT USAGE ON SCHEMA public TO pipeline_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO pipeline_reader;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO pipeline_reader;
+```
+
+Adjust the schema name and grant set to your environment. Avoid using a superuser.
+
+## Rotation
+
+Change the password in PostgreSQL, then update the **Credentials** form on the integration. Verify with **Test connection** before revoking the old password.

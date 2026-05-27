@@ -1,0 +1,42 @@
+---
+title: Integrations
+sidebarTitle: Overview
+description: Connect external systems once, then use them from any pipeline. Pipelines call providers through a proxy; secrets never touch generated step code.
+---
+
+A **provider** is an external system the platform can call—Gmail, Slack, Snowflake, and so on. An **integration** is your authenticated connection to one provider. Connect a provider once; reuse it across pipelines, apps, and queries.
+
+## Provider catalog
+
+| Provider | Category | Auth | Tutorial |
+|----------|----------|------|----------|
+| Gmail | Email | OAuth (Nango) | [Connect Gmail](/integrations/gmail) |
+| Slack | Messaging | OAuth (Nango) | [Connect Slack](/integrations/slack) |
+| Salesforce | CRM | OAuth (Nango) | [Connect Salesforce](/integrations/salesforce) |
+| Notion | Productivity | OAuth (Nango) | [Connect Notion](/integrations/notion) |
+| GitHub | Developer | OAuth (Nango) | [Connect GitHub](/integrations/github) |
+| Snowflake | Database | JWT key-pair (Nango) | [Connect Snowflake](/integrations/snowflake) |
+| Databricks | Database | OAuth (Nango) | [Connect Databricks](/integrations/databricks) |
+| PostgreSQL | Database | Host + credentials | [Connect PostgreSQL](/integrations/postgresql) |
+| INSEE SIRENE | Public data | API key | [Connect INSEE](/integrations/insee) |
+| Pappers | Public data | API key | [Connect Pappers](/integrations/pappers) |
+
+## Connection statuses
+
+Once connected, each integration shows one of three statuses:
+
+| Status | Meaning |
+|--------|---------|
+| **Connected** | Auth is valid; pipelines using this provider will run. |
+| **Disconnected** | The connection was deleted or never completed. |
+| **Error** | The provider rejected a recent request (revoked permissions, expired credential, scope missing). Look at **Monitoring → Priority actions** for the **Reconnect** prompt. |
+
+## How pipelines reach the provider
+
+Generated step code never sees raw credentials. The pipeline calls a platform proxy that injects the right token (Nango handles OAuth refresh; the platform handles API keys) and routes the request. This is why:
+
+- You connect once, not per pipeline.
+- Revoking a connection takes effect everywhere immediately.
+- Rotating a credential doesn't require touching any step.
+
+See [Authentication](/integrations/authentication) for the auth modes used by each provider type.
